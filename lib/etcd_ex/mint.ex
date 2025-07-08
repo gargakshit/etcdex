@@ -574,4 +574,88 @@ defmodule EtcdEx.Mint do
 
     send(env, "/etcdserverpb.Cluster/MemberPromote", body, EtcdEx.Proto.MemberPromoteResponse)
   end
+
+  @doc """
+  """
+  def user_add(env, name, password) do
+    body =
+      EtcdEx.Proto.AuthUserAddRequest
+      |> struct(name: name, password: password)
+      |> EtcdEx.Proto.AuthUserAddRequest.encode()
+
+    send(env, "/etcdserverpb.Auth/UserAdd", body, EtcdEx.Proto.AuthUserAddResponse)
+  end
+
+  @doc """
+  """
+  def user_delete(env, name) do
+    body =
+      EtcdEx.Proto.AuthUserDeleteRequest
+      |> struct(name: name)
+      |> EtcdEx.Proto.AuthUserDeleteRequest.encode()
+
+    send(env, "/etcdserverpb.Auth/UserDelete", body, EtcdEx.Proto.AuthUserDeleteResponse)
+  end
+
+  @doc """
+  """
+  def user_grant_role(env, user, role) do
+    body =
+      EtcdEx.Proto.AuthUserGrantRoleRequest
+      |> struct(user: user, role: role)
+      |> EtcdEx.Proto.AuthUserGrantRoleRequest.encode()
+
+    send(env, "/etcdserverpb.Auth/UserGrantRole", body, EtcdEx.Proto.AuthUserGrantRoleResponse)
+  end
+
+  @doc """
+  """
+  def role_add(env, role) do
+    body =
+      EtcdEx.Proto.AuthRoleAddRequest
+      |> struct(role: role)
+      |> EtcdEx.Proto.AuthRoleAddRequest.encode()
+
+    send(env, "/etcdserverpb.Auth/RoleAdd", body, EtcdEx.Proto.AuthRoleAddResponse)
+  end
+
+  @doc """
+  """
+  def role_delete(env, role) do
+    body =
+      EtcdEx.Proto.AuthRoleDeleteRequest
+      |> struct(role: role)
+      |> EtcdEx.Proto.AuthRoleDeleteRequest.encode()
+
+    send(env, "/etcdserverpb.Auth/RoleDelete", body, EtcdEx.Proto.AuthRoleDeleteResponse)
+  end
+
+  defp build_role_grant_permission_opts(_key, []), do: []
+
+  defp build_role_grant_permission_opts(key, [{:range_end, range_end} | opts]),
+    do: [{:range_end, range_end} | build_role_grant_permission_opts(key, opts)]
+
+  defp build_role_grant_permission_opts(key, [{:prefix, true} | opts]),
+    do: [{:range_end, next_key(key)} | build_role_grant_permission_opts(key, opts)]
+
+  @doc """
+  """
+  def role_grant_permission(env, name, permType, key, opts \\ [])
+      when is_binary(key) and is_list(opts) do
+    perm =
+      Authpb.Permission
+      |> struct([permType: permType, key: key] ++ build_role_grant_permission_opts(key, opts))
+
+    body =
+      EtcdEx.Proto.AuthRoleGrantPermissionRequest
+      |> struct(name: name, perm: perm)
+      |> EtcdEx.Proto.AuthRoleGrantPermissionRequest.encode()
+
+    send(
+      env,
+      "/etcdserverpb.Auth/RoleGrantPermission",
+      body,
+      EtcdEx.Proto.AuthRoleGrantPermissionResponse
+    )
+  end
 end

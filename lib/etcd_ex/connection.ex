@@ -39,7 +39,13 @@ defmodule EtcdEx.Connection do
     :remove_member,
     :update_member,
     :list_members,
-    :promote_member
+    :promote_member,
+    :user_add,
+    :user_delete,
+    :user_grant_role,
+    :role_add,
+    :role_delete,
+    :role_grant_permission
   ]
 
   @doc false

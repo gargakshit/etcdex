@@ -17,9 +17,12 @@ defmodule EtcdEx.Types do
   @type peer_url :: binary
   @type member_id :: pos_integer
   @type name :: binary
+  @type password :: binary
 
   @type filters :: [filter]
   @type filter :: :NOPUT | :NODELETE
+
+  @type permission_type :: :READ | :WRITE | :READWRITE
 
   @type get_opt ::
           {:range_end, range_end}
@@ -56,6 +59,8 @@ defmodule EtcdEx.Types do
           | {:filters, filters}
           | {:prev_kv, boolean}
           | {:progress_notify, boolean}
+
+  @type role_grant_permission_opt :: {:range_end, range_end} | {:prefix, boolean}
 
   @type ttl_opt ::
           {:keys, boolean}

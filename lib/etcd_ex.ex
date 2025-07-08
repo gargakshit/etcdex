@@ -694,4 +694,9 @@ defmodule EtcdEx do
   def promote_member(conn, member_id, timeout \\ @default_timeout) do
     EtcdEx.Connection.unary(conn, :promote_member, [member_id], timeout)
   end
+
+  @spec user_add(conn, Types.name(), Types.password(), timeout) :: {:ok, map} | {:error, any}
+  def user_add(conn, name, password, timeout \\ @default_timeout) do
+    EtcdEx.Connection.unary(conn, :user_add, [name, password], timeout)
+  end
 end
